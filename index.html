@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Solace — Daily Reflections</title>
+<meta name="description" content="A warm, private space to reflect on each day and gain gentle insight." />
+<meta name="theme-color" content="#F4EFE6" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#211D18" media="(prefers-color-scheme: dark)" />
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Solace" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<style>
+  :root{
+    --bg:#F4EFE6;
+    --bg-warm:#EFE7D8;
+    --surface:#FFFDF8;
+    --surface-2:#FBF5EA;
+    --ink:#3B342C;
+    --ink-soft:#6A6153;
+    --muted:#988D7B;
+    --line:#E7DECF;
+    --accent:#C0754F;      /* terracotta */
+    --accent-deep:#A85E3B;
+    --accent-soft:#F0D9C6;
+    --sage:#7E8B67;
+    --sage-soft:#E4E7D6;
+    --shadow:0 10px 30px -18px rgba(80,60,40,.45);
+    --radius:20px;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#211D18;
+      --bg-warm:#26221B;
+      --surface:#2C2720;
+      --surface-2:#332D25;
+      --ink:#EFE7D8;
+      --ink-soft:#C7BCA9;
+      --muted:#9A8F7C;
+      --line:#3D362C;
+      --accent:#E0996E;
+      --accent-deep:#CE8155;
+      --accent-soft:#4A3A2C;
+      --sage:#A3B084;
+      --sage-soft:#3A3E2E;
+      --shadow:0 14px 34px -18px rgba(0,0,0,.6);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:
+      radial-gradient(120% 80% at 50% -10%, var(--bg-warm), transparent 60%),
+      var(--bg);
+    min-height:100dvh;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;
+  }
+  .app{
+    max-width:640px;margin:0 auto;
+    min-height:100dvh;
+    display:flex;flex-direction:column;
+    padding:0 20px;
+    padding-top:max(18px, env(safe-area-inset-top));
+    padding-bottom:calc(84px + env(safe-area-inset-bottom));
+  }
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:6px 2px 14px;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .mark{
+    width:34px;height:34px;border-radius:11px;flex:none;
+    background:linear-gradient(150deg,#E7B489,var(--accent));
+    display:grid;place-items:center;color:#fff;box-shadow:var(--shadow);
+  }
+  .brand h1{font-family:var(--serif);font-size:22px;font-weight:600;margin:0;letter-spacing:.2px}
+  .icon-btn{
+    width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink-soft);font-size:18px;
+    display:grid;place-items:center;cursor:pointer;
+  }
+  .icon-btn:active{transform:scale(.95)}
+
+  main{flex:1;display:flex;flex-direction:column}
+  .view{display:none;animation:fade .35s ease}
+  .view.active{display:flex;flex-direction:column;flex:1}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .display{font-family:var(--serif);font-size:27px;line-height:1.2;margin:4px 0 2px;font-weight:600}
+  .sub{color:var(--ink-soft);font-size:15px;margin:0 0 16px}
+
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px;
+  }
+
+  /* Today */
+  .prompt{
+    font-family:var(--serif);font-style:italic;font-size:17px;color:var(--accent-deep);
+    background:var(--surface-2);border:1px dashed var(--accent-soft);
+    padding:12px 14px;border-radius:14px;margin-bottom:14px;line-height:1.4;
+  }
+  label.field-label{font-size:13px;font-weight:600;color:var(--ink-soft);display:block;margin:2px 0 8px}
+  textarea#entry{
+    width:100%;min-height:210px;resize:vertical;border:none;outline:none;background:transparent;
+    font-family:var(--serif);font-size:18px;line-height:1.6;color:var(--ink);
+  }
+  textarea#entry::placeholder{color:var(--muted);font-style:italic}
+  .moods{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 4px}
+  .mood{
+    border:1px solid var(--line);background:var(--surface);border-radius:999px;
+    padding:8px 12px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--ink-soft);
+    transition:.15s;
+  }
+  .mood .dot{font-size:16px}
+  .mood.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-deep);font-weight:600}
+  .row{display:flex;gap:10px;align-items:center}
+  .grow{flex:1}
+  .count{font-size:12.5px;color:var(--muted)}
+
+  .btn{
+    appearance:none;border:none;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:16px;
+    padding:14px 18px;border-radius:15px;color:#fff;
+    background:linear-gradient(150deg,var(--accent),var(--accent-deep));
+    box-shadow:var(--shadow);width:100%;
+  }
+  .btn:active{transform:scale(.985)}
+  .btn.ghost{background:var(--surface);color:var(--accent-deep);border:1px solid var(--accent-soft);box-shadow:none}
+  .btn.small{width:auto;padding:9px 14px;font-size:14px;border-radius:12px}
+  .saved-pill{
+    display:inline-flex;align-items:center;gap:6px;color:var(--sage);font-weight:600;font-size:14px;
+    opacity:0;transition:.3s;
+  }
+  .saved-pill.show{opacity:1}
+
+  /* Journal */
+  .search{
+    width:100%;border:1px solid var(--line);background:var(--surface);border-radius:14px;
+    padding:12px 14px;font-size:15px;color:var(--ink);outline:none;margin-bottom:14px;font-family:var(--sans);
+  }
+  .entry{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 16px;margin-bottom:12px;
+    box-shadow:var(--shadow);cursor:pointer;transition:.15s;
+  }
+  .entry:active{transform:scale(.99)}
+  .entry .meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+  .entry .date{font-family:var(--serif);font-size:16px;font-weight:600}
+  .entry .mtag{font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:5px}
+  .entry .excerpt{color:var(--ink-soft);font-size:14.5px;line-height:1.5;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .empty{
+    text-align:center;color:var(--muted);padding:44px 20px;
+  }
+  .empty .big{font-size:38px;margin-bottom:10px}
+
+  /* Chat */
+  .chat-scroll{flex:1;display:flex;flex-direction:column;gap:12px;padding:4px 0 8px;overflow-y:auto}
+  .bubble{max-width:86%;padding:13px 15px;border-radius:18px;font-size:15.5px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+  .bubble.ai{background:var(--surface);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:6px;box-shadow:var(--shadow)}
+  .bubble.me{background:linear-gradient(150deg,var(--accent),var(--accent-deep));color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+  .bubble.ai .cursor{display:inline-block;width:7px;height:16px;background:var(--accent);vertical-align:-2px;border-radius:2px;animation:blink 1s steps(2) infinite;margin-left:2px}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .chip-row{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;margin:0 -20px;padding-left:20px;padding-right:20px}
+  .chip-row::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none;border:1px solid var(--accent-soft);background:var(--surface);color:var(--accent-deep);
+    border-radius:999px;padding:9px 13px;font-size:13.5px;cursor:pointer;font-weight:500;
+  }
+  .composer{
+    display:flex;gap:9px;align-items:flex-end;padding-top:8px;border-top:1px solid var(--line);
+  }
+  textarea#chatInput{
+    flex:1;border:1px solid var(--line);background:var(--surface);border-radius:16px;
+    padding:12px 14px;font-size:15.5px;color:var(--ink);outline:none;resize:none;max-height:120px;
+    font-family:var(--sans);line-height:1.4;
+  }
+  .send{
+    width:46px;height:46px;flex:none;border-radius:14px;border:none;cursor:pointer;color:#fff;font-size:18px;
+    background:linear-gradient(150deg,var(--accent),var(--accent-deep));box-shadow:var(--shadow);
+    display:grid;place-items:center;
+  }
+  .send:disabled{opacity:.5}
+  .disclaimer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.4}
+
+  /* Bottom nav */
+  nav.tabbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+    background:color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter:saturate(1.4) blur(16px);-webkit-backdrop-filter:saturate(1.4) blur(16px);
+    border-top:1px solid var(--line);
+  }
+  .tabbar .inner{max-width:640px;margin:0 auto;display:flex;justify-content:space-around}
+  .tab{
+    flex:1;background:none;border:none;cursor:pointer;color:var(--muted);
+    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:4px;
+  }
+  .tab .ic{font-size:21px;line-height:1}
+  .tab.active{color:var(--accent-deep)}
+
+  /* Sheet / modal */
+  .scrim{position:fixed;inset:0;background:rgba(30,22,14,.42);z-index:60;display:none;align-items:flex-end;justify-content:center}
+  .scrim.open{display:flex;animation:fade .2s}
+  .sheet{
+    width:100%;max-width:640px;background:var(--surface);border-radius:24px 24px 0 0;
+    padding:20px 20px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px -20px rgba(0,0,0,.4);
+    animation:up .28s cubic-bezier(.2,.8,.2,1);max-height:88dvh;overflow-y:auto;
+  }
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .sheet h2{font-family:var(--serif);font-size:21px;margin:2px 0 4px}
+  .sheet p.note{color:var(--ink-soft);font-size:14px;line-height:1.55;margin:0 0 16px}
+  .sheet label{font-size:13px;font-weight:600;color:var(--ink-soft);display:block;margin:14px 0 6px}
+  .sheet input,.sheet textarea{
+    width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;
+    padding:12px 13px;font-size:15px;color:var(--ink);outline:none;font-family:var(--sans);
+  }
+  .sheet .hint{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .sheet .hint a{color:var(--accent-deep)}
+  .sheet-actions{display:flex;gap:10px;margin-top:20px}
+  .grabber{width:38px;height:4px;border-radius:99px;background:var(--line);margin:-6px auto 14px}
+  .link{color:var(--accent-deep);cursor:pointer;font-weight:600;background:none;border:none;font-size:14px;padding:0}
+  .danger{color:#B5493B}
+  .readview .rdate{font-family:var(--serif);font-size:22px;font-weight:600;margin:0}
+  .readview .rmood{color:var(--ink-soft);font-size:14px;margin:6px 0 14px;display:flex;align-items:center;gap:6px}
+  .readview .rtext{font-family:var(--serif);font-size:17px;line-height:1.65;white-space:pre-wrap;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 21c4.5-3 8-6.2 8-11a5 5 0 0 0-8-4 5 5 0 0 0-8 4c0 4.8 3.5 8 8 11Z" fill="currentColor" opacity=".92"/><path d="M12 7v9" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".7"/></svg>
+      </div>
+      <h1>Solace</h1>
+    </div>
+    <button class="icon-btn" id="settingsBtn" aria-label="Settings">⚙︎</button>
+  </header>
+
+  <main>
+    <!-- ===== TODAY ===== -->
+    <section class="view active" id="view-today">
+      <div class="eyebrow" id="todayEyebrow">Today</div>
+      <h2 class="display" id="todayDate">—</h2>
+      <p class="sub" id="todayGreeting">A quiet moment for yourself.</p>
+
+      <div class="card">
+        <div class="prompt" id="prompt">How are you, really, right now?</div>
+        <label class="field-label">Your reflection</label>
+        <textarea id="entry" placeholder="Let your thoughts land here… there's no wrong way to write."></textarea>
+        <div class="row" style="margin-top:6px;margin-bottom:14px">
+          <span class="count grow" id="count">0 words</span>
+        </div>
+        <label class="field-label">How did today feel?</label>
+        <div class="moods" id="moods"></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <button class="btn" id="saveBtn">Save today's reflection</button>
+        <div style="text-align:center;margin-top:12px">
+          <span class="saved-pill" id="savedPill">✓ Saved to your journal</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== JOURNAL ===== -->
+    <section class="view" id="view-journal">
+      <div class="eyebrow">Your journal</div>
+      <h2 class="display">Every day you've shown up</h2>
+      <p class="sub" id="journalCount">—</p>
+      <input class="search" id="search" placeholder="Search your reflections…" />
+      <div id="entryList"></div>
+    </section>
+
+    <!-- ===== REFLECT (chat) ===== -->
+    <section class="view" id="view-chat">
+      <div class="eyebrow">Reflect together</div>
+      <h2 class="display">Talk it through</h2>
+      <p class="sub">A gentle companion who has read your journal and listens without judgment.</p>
+      <div class="chip-row" id="chips"></div>
+      <div class="chat-scroll" id="chatScroll"></div>
+      <div class="composer">
+        <textarea id="chatInput" rows="1" placeholder="Ask anything, or just share what's on your mind…"></textarea>
+        <button class="send" id="sendBtn" aria-label="Send">↑</button>
+      </div>
+      <div class="disclaimer">Solace is a reflective companion, not a therapist or crisis service. In an emergency, contact local emergency services or a crisis line.</div>
+    </section>
+  </main>
+</div>
+
+<!-- Bottom nav -->
+<nav class="tabbar">
+  <div class="inner">
+    <button class="tab active" data-tab="today"><span class="ic">✍️</span>Today</button>
+    <button class="tab" data-tab="journal"><span class="ic">📖</span>Journal</button>
+    <button class="tab" data-tab="chat"><span class="ic">🌤️</span>Reflect</button>
+  </div>
+</nav>
+
+<!-- Settings sheet -->
+<div class="scrim" id="settingsScrim">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="grabber"></div>
+    <h2>Settings</h2>
+    <p class="note">Solace keeps your reflections privately on this device. To chat with your reflective companion, connect a Claude API key — it's stored only here, on your phone, and used solely to reach Anthropic.</p>
+
+    <label for="apiKey">Claude API key</label>
+    <input id="apiKey" type="password" placeholder="sk-ant-…" autocomplete="off" spellcheck="false" />
+    <div class="hint">Create a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. It never leaves your device except in requests to Anthropic.</div>
+
+    <label for="model">Model</label>
+    <input id="model" type="text" placeholder="claude-opus-4-8" autocomplete="off" spellcheck="false" />
+    <div class="hint">Advanced — leave as-is unless you know you want a different Claude model.</div>
+
+    <label for="userName">What should Solace call you? <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+    <input id="userName" type="text" placeholder="Your name" autocomplete="off" />
+
+    <div class="sheet-actions">
+      <button class="btn ghost" id="settingsClose" style="width:auto;flex:1">Close</button>
+      <button class="btn" id="settingsSave" style="width:auto;flex:1">Save</button>
+    </div>
+    <div style="margin-top:18px;display:flex;justify-content:space-between;align-items:center">
+      <button class="link" id="exportBtn">Export my data</button>
+      <button class="link danger" id="clearChatBtn">Clear conversation</button>
+    </div>
+  </div>
+</div>
+
+<!-- Read/entry sheet -->
+<div class="scrim" id="readScrim">
+  <div class="sheet readview" role="dialog" aria-modal="true">
+    <div class="grabber"></div>
+    <h2 class="rdate" id="readDate">—</h2>
+    <div class="rmood" id="readMood"></div>
+    <div class="rtext" id="readText"></div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="editEntry" style="width:auto;flex:1">Edit</button>
+      <button class="btn" id="readClose" style="width:auto;flex:1">Close</button>
+    </div>
+    <div style="margin-top:16px;text-align:center">
+      <button class="link danger" id="deleteEntry">Delete this entry</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
