@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
 <title>Solace — Daily Reflections</title>
 <meta name="description" content="A bold, private space to reflect on each day and gain fresh insight." />
-<meta name="theme-color" content="#F3F1F9" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#120E20" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#FFFCF8" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#17120B" media="(prefers-color-scheme: dark)" />
 <link rel="manifest" href="manifest.webmanifest" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -17,55 +17,55 @@
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
 <style>
   :root{
-    --bg:#F3F1F9;
-    --bg-glow:#E9E4F8;
+    --bg:#FFFCF8;             /* warm white */
+    --bg-glow:#FFE9D2;
     --surface:#FFFFFF;
-    --surface-2:#F5F2FC;
-    --ink:#1A1430;
-    --ink-soft:#4C4468;
-    --muted:#8B84A3;
-    --line:#E7E1F3;
-    --accent:#F5325B;         /* hot rose */
-    --accent-deep:#8B2FE8;    /* electric violet */
-    --accent-ink:#C81E63;     /* legible accent text on light */
-    --accent-soft:#FBDDE7;
-    --grad:linear-gradient(135deg,#FF6A3D 0%,#F5325B 48%,#8B2FE8 100%);
-    --grad-soft:linear-gradient(135deg,#FF6A3D22,#8B2FE822);
-    --shadow:0 14px 34px -18px rgba(139,47,232,.45);
-    --shadow-hot:0 12px 30px -12px rgba(245,50,91,.55);
+    --surface-2:#FFF3E7;
+    --ink:#241A12;            /* warm near-black */
+    --ink-soft:#6B5A4A;
+    --muted:#A89A8B;
+    --line:#F0E4D6;
+    --accent:#FF6B00;         /* bold orange */
+    --accent-deep:#E5231C;    /* bold red */
+    --accent-ink:#CC5200;     /* deep orange — legible text on white */
+    --accent-soft:#FFE1C2;
+    --red:#E5231C;            /* bold red */
+    --yellow:#FFB800;         /* bold yellow */
+    --grad:#FF6B00;           /* solid — no gradients */
+    --grad-soft:#FFEDDD;
+    --shadow:0 12px 30px -18px rgba(229,90,0,.40);
+    --shadow-hot:0 12px 28px -12px rgba(255,107,0,.50);
     --radius:20px;
     --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
     --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#120E20;
-      --bg-glow:#1C1338;
-      --surface:#1D1635;
-      --surface-2:#251C42;
-      --ink:#F1ECFF;
-      --ink-soft:#C6BDE6;
-      --muted:#8E85AD;
-      --line:#322A52;
-      --accent:#FF5C7A;
-      --accent-deep:#A968FF;
-      --accent-ink:#FF8CA6;
-      --accent-soft:#38234F;
-      --grad:linear-gradient(135deg,#FF8A4C 0%,#FF3D6E 48%,#A24BFF 100%);
-      --grad-soft:linear-gradient(135deg,#FF8A4C25,#A24BFF25);
+      --bg:#17120B;            /* warm near-black */
+      --bg-glow:#2A1D0E;
+      --surface:#221A10;
+      --surface-2:#2C2213;
+      --ink:#FFF3E6;
+      --ink-soft:#D8C6B2;
+      --muted:#A2917D;
+      --line:#3A2C1B;
+      --accent:#FF8524;        /* bold orange (brighter for dark) */
+      --accent-deep:#FF4D42;   /* bold red */
+      --accent-ink:#FFA24D;    /* readable orange on dark */
+      --accent-soft:#3D2A14;
+      --red:#FF4D42;
+      --yellow:#FFC633;
+      --grad:#FF8524;          /* solid */
+      --grad-soft:#2E2010;
       --shadow:0 16px 38px -18px rgba(0,0,0,.7);
-      --shadow-hot:0 14px 34px -14px rgba(255,61,110,.5);
+      --shadow-hot:0 14px 30px -14px rgba(255,133,36,.42);
     }
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
     font-family:var(--sans);color:var(--ink);
-    background:
-      radial-gradient(120% 70% at 100% -10%, var(--bg-glow), transparent 55%),
-      radial-gradient(120% 70% at 0% 110%, var(--bg-glow), transparent 55%),
-      var(--bg);
-    background-attachment:fixed;
+    background:var(--bg);
     min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;
   }
   .app{max-width:640px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;
@@ -73,7 +73,7 @@
     padding-bottom:calc(88px + env(safe-area-inset-bottom));}
   header.top{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 14px}
   .brand{display:flex;align-items:center;gap:11px}
-  .brand .mark{width:36px;height:36px;border-radius:12px;flex:none;background:var(--grad);
+  .brand .mark{width:36px;height:36px;border-radius:12px;flex:none;background:var(--red);
     display:grid;place-items:center;color:#fff;box-shadow:var(--shadow-hot)}
   .brand h1{font-family:var(--serif);font-size:23px;font-weight:700;margin:0;letter-spacing:.2px;
     background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -94,7 +94,7 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
 
   .streak{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;
-    background:var(--grad);color:#fff;font-weight:700;font-size:14px;box-shadow:var(--shadow-hot);margin-bottom:2px}
+    background:var(--yellow);color:#3A2600;font-weight:800;font-size:14px;box-shadow:var(--shadow-hot);margin-bottom:2px}
   .streak.zero{background:var(--surface-2);color:var(--ink-soft);box-shadow:none;border:1px solid var(--line)}
 
   .memory{background:var(--grad-soft);border:1px solid var(--accent-soft);border-radius:16px;padding:13px 15px;margin-bottom:14px;cursor:pointer}
@@ -147,7 +147,7 @@
     background:var(--surface-2);position:relative}
   .cal-cell.empty{background:transparent}
   .cal-cell.has{color:#fff;font-weight:700;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.3)}
-  .cal-cell.today{outline:2px solid var(--accent);outline-offset:1px}
+  .cal-cell.today{outline:2px solid var(--red);outline-offset:1px}
   .backup-note{margin-top:14px;font-size:12.5px;color:var(--ink-soft);text-align:center;line-height:1.5}
   .backup-note button{background:none;border:none;color:var(--accent-ink);font-weight:700;cursor:pointer;padding:0;font-size:12.5px}
 
@@ -219,8 +219,7 @@
   .readview .rtext{font-family:var(--serif);font-size:17px;line-height:1.65;white-space:pre-wrap;color:var(--ink)}
 
   /* Lock screen */
-  #lockScreen{position:fixed;inset:0;z-index:100;background:
-      radial-gradient(120% 60% at 50% 0%, var(--bg-glow), transparent 60%),var(--bg);
+  #lockScreen{position:fixed;inset:0;z-index:100;background:var(--bg);
     display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;
     padding-top:max(30px,env(safe-area-inset-top))}
   #lockScreen.show{display:flex}

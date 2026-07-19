@@ -1,6 +1,6 @@
 /* Solace service worker — offline shell caching.
    Journaling works fully offline; only the AI companion needs the network. */
-var CACHE = "solace-v2";
+var CACHE = "solace-v3";
 var ASSETS = [
   "./",
   "./index.html",
