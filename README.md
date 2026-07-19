@@ -6,9 +6,15 @@ iPhone Home Screen and feels like a native app, with a full-screen icon and offl
 
 ## What it does
 
-- **Today** — write your reflection for the day, choose how it felt, and save it. A fresh, gentle prompt greets you each day.
-- **Journal** — every entry is stored on its own page, browsable and searchable by date and mood. Your record of showing up.
+- **Today** — write your reflection for the day, choose how it felt, and save it. A fresh prompt greets you daily, and a 🔥 streak counter tracks how many days in a row you've shown up. "On this day" surfaces a past reflection when one exists.
+- **Journal** — every entry is stored on its own page, browsable and searchable by date and mood, with a colour-coded month calendar, a mood breakdown, and your streak/entry stats. Your record of showing up.
 - **Reflect** — an AI companion that has read *all* of your journal and helps you notice patterns, reframe hard days, and understand yourself with more compassion. It's grounded in what you actually wrote, references specific days, and asks caring questions.
+
+### Also included
+
+- **Passcode lock** — optionally protect your journal with a 4-digit passcode (Settings → Privacy).
+- **Backup & restore** — export your whole journal to a file, and import it back on a new device (Settings → Your data). Solace also asks the browser for durable storage so your entries are less likely to be evicted.
+- **Bold, theme-aware design** — a vibrant sunset-to-violet palette that adapts to your phone's light or dark mode.
 
 ## Your privacy
 
