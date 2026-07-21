@@ -1,13 +1,13 @@
 {
-  "name": "Solace — Daily Reflections",
-  "short_name": "Solace",
-  "description": "A warm, private space to reflect on each day and gain gentle insight.",
+  "name": "GUTTED — Launch Tracker",
+  "short_name": "GUTTED",
+  "description": "A 4-week launch command center: log posts, watch the week-4 gate, and don't blow the budget.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FFFCF8",
-  "theme_color": "#FFFCF8",
+  "background_color": "#F5EFE3",
+  "theme_color": "#B21E28",
   "icons": [
     { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
