@@ -356,6 +356,25 @@
   details.settings summary::-webkit-details-marker{display:none;}
   details.settings summary:hover{color:var(--accent);}
 
+  /* trends / sparklines */
+  .trend{padding:10px 0;border-bottom:1px solid var(--line);}
+  .trend:last-child{border-bottom:none;}
+  .trend-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px;}
+  .trend-last{font-weight:700;color:var(--ink);font-size:14px;}
+  svg.spark{width:100%;height:54px;display:block;}
+  /* post link + notes */
+  .chip.linkchip{background:var(--accent-soft);color:var(--accent-deep);border-color:transparent;text-decoration:none;font-weight:700;}
+  .pnotes{margin-top:10px;font-size:14px;line-height:1.45;color:var(--ink-soft);border:1px dashed var(--line-strong);border-radius:var(--r-sm);padding:8px 10px;outline:none;min-height:20px;word-break:break-word;background:var(--bg);}
+  .pnotes:focus{border-style:solid;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .pnotes:empty:before{content:attr(data-ph);color:var(--muted);}
+  a.linkbtn{text-decoration:none;color:var(--accent);}
+  /* week grouping */
+  .week-h{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-deep);font-weight:700;margin:18px 0 8px;display:flex;align-items:center;gap:10px;}
+  #postList .week-h:first-child{margin-top:2px;}
+  .week-h .pct{color:var(--muted);font-weight:600;letter-spacing:.04em;margin-left:auto;}
+  .targets-box{margin-top:2px;margin-bottom:14px;}
+  .targets-box summary{padding:2px 0;}
+
   .disclaimer{text-align:center;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:20px 0 6px;}
 
   @media (prefers-reduced-motion: reduce){
@@ -418,6 +437,8 @@
         </select>
       </label>
       <label class="f"><span class="lab">Hook / title</span><input type="text" id="np-hook" placeholder="the line that stops the scroll"></label>
+      <label class="f"><span class="lab">Link (optional)</span><input type="text" inputmode="url" id="np-link" placeholder="paste the post URL"></label>
+      <label class="f"><span class="lab">Notes (optional)</span><textarea id="np-notes" placeholder="the caption you used, or a reminder"></textarea></label>
       <button class="btn block" id="addPostBtn" disabled>Log it</button>
       <div class="helper" id="addPostHelper">Tick all three above first. The gate is watching.</div>
     </div>
@@ -442,6 +463,11 @@
     </div>
 
     <div class="card">
+      <div class="eyebrow" style="margin-bottom:12px;">Momentum · across your posts</div>
+      <div id="trends"></div>
+    </div>
+
+    <div class="card">
       <div class="eyebrow" style="margin-bottom:10px;">Manual inputs · update from Carrd</div>
       <div class="grid2">
         <label class="f"><span class="lab">Current followers</span><input type="number" min="0" inputmode="numeric" id="in-followers" placeholder="0"></label>
@@ -455,6 +481,20 @@
       <label class="f" style="margin-bottom:6px;"><span class="lab">Test start date</span><input type="date" id="in-start"></label>
       <div id="clockLine" class="flag" style="margin-top:8px;"></div>
     </div>
+
+    <details class="settings targets-box">
+      <summary>Adjust gate targets</summary>
+      <div class="card" style="margin-top:10px;">
+        <div class="eyebrow" style="margin-bottom:10px;">Green-gate targets</div>
+        <div class="grid2">
+          <label class="f"><span class="lab">Views (1 post over)</span><input type="number" min="0" inputmode="numeric" id="tg-views" placeholder="10000"></label>
+          <label class="f"><span class="lab">Waitlist (target)</span><input type="number" min="0" inputmode="numeric" id="tg-waitlist" placeholder="50"></label>
+          <label class="f"><span class="lab">Followers floor</span><input type="number" min="0" inputmode="numeric" id="tg-ffloor" placeholder="200"></label>
+          <label class="f"><span class="lab">Followers ceiling</span><input type="number" min="0" inputmode="numeric" id="tg-fceil" placeholder="500"></label>
+        </div>
+        <div class="helper">The gauges and verdict recalculate against these. Defaults: 10k / 200–500 / 50.</div>
+      </div>
+    </details>
   </section>
 
   <!-- MONEY -->
@@ -562,11 +602,21 @@
 
     <div class="card" id="ideaList"></div>
 
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:10px;">Your data · backup &amp; restore</div>
+      <div class="grid2">
+        <button class="btn ghost sm" id="exportBtn">⭳ Export backup</button>
+        <button class="btn ghost sm" id="importBtn">⭱ Import backup</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <div class="helper">Everything lives only in this browser. Export a file to back it up or move to another device; import to restore it.</div>
+    </div>
+
     <details class="settings" style="text-align:center;margin-top:8px;">
       <summary>Danger zone · wipe everything</summary>
       <div style="margin-top:12px;">
         <button class="btn ghost sm" id="wipeBtn">Erase all data on this device</button>
-        <div class="helper">No cloud, no backup, no takebacks. Everything lives in this browser only.</div>
+        <div class="helper">No cloud, no takebacks. Export a backup first if you might want it later.</div>
       </div>
     </details>
   </section>
@@ -667,6 +717,10 @@
     if(added) localStorage.setItem(KEY, JSON.stringify(S));
   })();
 
+  // config / post-shape migrations
+  if(!S.config.targets) S.config.targets = {views:GATE.views,followersFloor:GATE.followersFloor,followersCeil:GATE.followersCeil,waitlist:GATE.waitlist};
+  S.posts.forEach(function(p){ if(p.link===undefined) p.link=""; if(p.notes===undefined) p.notes=""; });
+
   var saveTimer;
   function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(function(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }, 120); }
 
@@ -694,6 +748,19 @@
     return bestScore>0 ? best : null;
   }
   function maxViews(){ var m=0; S.posts.forEach(function(p){ m=Math.max(m,n(p.views)); }); return m; }
+  function getTargets(){
+    var t=(S.config&&S.config.targets)||{};
+    return {
+      views: n(t.views)||GATE.views,
+      followersFloor: n(t.followersFloor)||GATE.followersFloor,
+      followersCeil: n(t.followersCeil)||GATE.followersCeil,
+      waitlist: n(t.waitlist)||GATE.waitlist
+    };
+  }
+  // posts sorted oldest→newest by date (then id) — for time series
+  function postsByDate(){
+    return S.posts.slice().sort(function(a,b){ return (a.date||"").localeCompare(b.date||"") || (a.id>b.id?1:-1); });
+  }
 
   function daysRemaining(){
     if(!S.config.startDate) return null;
@@ -711,11 +778,21 @@
     return daysBetween(latest, today);
   }
   function phaseSpend(){ var s=0; S.expenses.forEach(function(e){ s+=n(e.amount); }); return s; }
+  function weekOf(dateStr){
+    if(!S.config.startDate || !dateStr) return null;
+    var start=new Date(S.config.startDate+"T00:00:00"), d=new Date(dateStr+"T00:00:00");
+    if(isNaN(start)||isNaN(d)) return null;
+    var diff=daysBetween(start,d);
+    if(diff<0) return null;
+    return Math.floor(diff/7)+1;
+  }
+  function safeUrl(u){ if(!u) return ""; return /^https?:\/\//i.test(u) ? u : "https://"+u; }
 
   /* ---------- verdict ---------- */
   function computeVerdict(){
+    var T=getTargets();
     var v=maxViews(), f=n(S.config.followers), w=n(S.config.waitlist);
-    var rV=v/GATE.views, rF=f/GATE.followersFloor, rW=w/GATE.waitlist;
+    var rV=v/T.views, rF=f/T.followersFloor, rW=w/T.waitlist;
     var posts=S.posts.length;
     if(posts===0 && f===0 && w===0){
       return {code:"idle",title:"No signal yet",dot:"idle",
@@ -727,7 +804,7 @@
     }
     if(rV>=0.6 && rF>=0.6 && rW>=0.6){
       return {code:"good",title:"Green",dot:"good",
-        msg:"All three are trending to hit — a post near 10k, followers climbing toward the band, waitlist filling. This is the gate saying go. Start the manufacturer emails."};
+        msg:"All three are trending to hit — a post near target, followers climbing toward the band, waitlist filling. This is the gate saying go. Start the manufacturer emails."};
     }
     return {code:"warn",title:"Sharpen hooks",dot:"warn",
       msg:"Soft but alive. Something's moving, not everything. Tighten the hooks, lean into what's landing, and give it the rest of the four weeks."};
@@ -769,11 +846,12 @@
   }
 
   function renderGauges(){
+    var T=getTargets();
     var v=maxViews(), f=n(S.config.followers), w=n(S.config.waitlist);
     var items=[
-      {k:"Best-post views",disp:fmt(v),target:"target 10k",fill:v/GATE.views,statFrac:v/GATE.views,tick:null},
-      {k:"Followers",disp:fmt(f),target:"band 200–500",fill:f/GATE.followersCeil,statFrac:f/GATE.followersFloor,tick:GATE.followersFloor/GATE.followersCeil},
-      {k:"Waitlist",disp:fmt(w),target:"target 50+",fill:w/GATE.waitlist,statFrac:w/GATE.waitlist,tick:null}
+      {k:"Best-post views",disp:fmt(v),target:"target "+fmt(T.views),fill:v/T.views,statFrac:v/T.views,tick:null},
+      {k:"Followers",disp:fmt(f),target:"band "+fmt(T.followersFloor)+"–"+fmt(T.followersCeil),fill:f/T.followersCeil,statFrac:f/T.followersFloor,tick:T.followersFloor/T.followersCeil},
+      {k:"Waitlist",disp:fmt(w),target:"target "+fmt(T.waitlist)+"+",fill:w/T.waitlist,statFrac:w/T.waitlist,tick:null}
     ];
     $("gauges").innerHTML = items.map(function(it){
       var st=statusOf(it.statFrac);
@@ -791,6 +869,54 @@
     box.className="verdict-box "+vd.code;
     $("verdictH").innerHTML='<span class="dot '+vd.dot+'"></span> '+vd.title;
     $("verdictP").textContent=vd.msg;
+
+    renderTrends();
+  }
+
+  /* ---------- trends (sparklines) ---------- */
+  function sparkline(values, color){
+    var W=260, H=54, pad=4;
+    if(!values.length) return '';
+    var max=Math.max.apply(null, values), min=Math.min.apply(null, values.concat([0]));
+    var span=(max-min)||1;
+    var stepX = values.length>1 ? (W-pad*2)/(values.length-1) : 0;
+    var pts = values.map(function(val,i){
+      var x = pad + (values.length>1 ? i*stepX : (W-pad*2)/2);
+      var y = pad + (H-pad*2) * (1 - (val-min)/span);
+      return [x,y];
+    });
+    var line = pts.map(function(p,i){ return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
+    var area = line+' L'+pts[pts.length-1][0].toFixed(1)+' '+(H-pad)+' L'+pts[0][0].toFixed(1)+' '+(H-pad)+' Z';
+    var end=pts[pts.length-1];
+    var dots = values.length===1 ? '<circle cx="'+end[0].toFixed(1)+'" cy="'+end[1].toFixed(1)+'" r="3.4" fill="'+color+'"/>' : '';
+    return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" class="spark" aria-hidden="true">'+
+      '<path d="'+area+'" fill="'+color+'" opacity="0.13"/>'+
+      '<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+      dots+
+      '<circle cx="'+end[0].toFixed(1)+'" cy="'+end[1].toFixed(1)+'" r="3.4" fill="var(--surface)" stroke="'+color+'" stroke-width="2"/>'+
+    '</svg>';
+  }
+  function renderTrends(){
+    var el=$("trends"); if(!el) return;
+    var byd=postsByDate();
+    if(byd.length<1){
+      el.innerHTML='<div class="empty" style="padding:20px"><div class="small">log a post and your momentum shows up here.</div></div>';
+      return;
+    }
+    var views=byd.map(function(p){ return n(p.views); });
+    var cumFoll=[], run=0; byd.forEach(function(p){ run+=n(p.followers); cumFoll.push(run); });
+    var engage=byd.map(function(p){ return n(p.saves)+n(p.shares); });
+    var rows=[
+      {k:"Views per post", vals:views, color:"var(--accent)", last:fmt(views[views.length-1])},
+      {k:"Followers gained (running)", vals:cumFoll, color:"var(--lime-ink)", last:"+"+fmt(cumFoll[cumFoll.length-1])},
+      {k:"Saves + shares per post", vals:engage, color:"var(--orange)", last:fmt(engage[engage.length-1])}
+    ];
+    el.innerHTML = rows.map(function(r){
+      return '<div class="trend">'+
+        '<div class="trend-head"><span class="gk">'+r.k+'</span><span class="trend-last num">'+r.last+'</span></div>'+
+        sparkline(r.vals, r.color)+
+      '</div>';
+    }).join("");
   }
 
   /* ---------- vitals ---------- */
@@ -830,13 +956,14 @@
       return;
     }
     var best=bestPostId();
-    var sorted=S.posts.slice().sort(function(a,b){ return (b.date||"").localeCompare(a.date||"") || (b.id>a.id?1:-1); });
-    listEl.innerHTML = sorted.map(function(p){
+    function metric(p,k,label,hero){
+      return '<div class="metric'+(hero?' hero':'')+'"><div class="mk">'+label+'</div>'+
+        '<input type="number" min="0" inputmode="numeric" data-metric="'+k+'" data-id="'+p.id+'" value="'+(p[k]||"")+'" placeholder="0" aria-label="'+label+'"></div>';
+    }
+    function postCard(p){
       var isBest=p.id===best;
-      var metric=function(k,label,hero){
-        return '<div class="metric'+(hero?' hero':'')+'"><div class="mk">'+label+'</div>'+
-          '<input type="number" min="0" inputmode="numeric" data-metric="'+k+'" data-id="'+p.id+'" value="'+(p[k]||"")+'" placeholder="0" aria-label="'+label+'"></div>';
-      };
+      var href=safeUrl(p.link);
+      var linkChip = href ? '<a class="chip linkchip" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">open ↗</a>' : '';
       return '<div class="post'+(isBest?' best':'')+'" data-id="'+p.id+'">'+
         '<div class="phead">'+
           '<div class="hook" contenteditable="true" role="textbox" aria-label="Hook" data-edit="hook" data-id="'+p.id+'">'+esc(p.hook||"(no hook — bold move)")+'</div>'+
@@ -846,15 +973,42 @@
           '<span class="chip mono">'+esc(p.date||"no date")+'</span>'+
           '<span class="chip accent">'+esc(p.platform||"—")+'</span>'+
           '<span class="chip">'+esc(fmtFormat(p.format))+'</span>'+
+          linkChip+
           (isBest?'<span class="chip data">saves+shares '+(n(p.saves)+n(p.shares))+'</span>':'')+
         '</div>'+
         '<div class="metrics">'+
-          metric("views","Views")+metric("saves","Saves ★",true)+metric("shares","Shares ★",true)+
-          metric("comments","Comments")+metric("followers","New foll.")+
+          metric(p,"views","Views")+metric(p,"saves","Saves ★",true)+metric(p,"shares","Shares ★",true)+
+          metric(p,"comments","Comments")+metric(p,"followers","New foll.")+
         '</div>'+
-        '<div class="row-actions"><button class="linkbtn" data-del-post="'+p.id+'">delete post</button></div>'+
+        '<div class="pnotes" contenteditable="true" role="textbox" aria-label="Notes" data-edit="notes" data-id="'+p.id+'" data-ph="add a note — caption, sound, reminder…">'+esc(p.notes||"")+'</div>'+
+        '<div class="row-actions">'+
+          (href?'<a class="linkbtn" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">view post ↗</a>':'')+
+          '<button class="linkbtn" data-edit-link="'+p.id+'">'+(href?"edit link":"add link")+'</button>'+
+          '<button class="linkbtn" data-del-post="'+p.id+'">delete post</button>'+
+        '</div>'+
       '</div>';
-    }).join("");
+    }
+    function newestFirst(a,b){ return (b.date||"").localeCompare(a.date||"") || (b.id>a.id?1:-1); }
+
+    if(S.config.startDate){
+      // group by week of the 4-week test, newest week first
+      var byWeek={};
+      S.posts.forEach(function(p){
+        var wk=weekOf(p.date); var id = wk==null?"pre":wk;
+        (byWeek[id]=byWeek[id]||[]).push(p);
+      });
+      var weekNums=Object.keys(byWeek).filter(function(k){return k!=="pre";}).map(Number).sort(function(a,b){return b-a;});
+      function block(title,items){
+        items=items.slice().sort(newestFirst);
+        return '<div class="week-h"><span>'+esc(title)+'</span><span class="pct">'+items.length+' post'+(items.length===1?'':'s')+'</span></div>'+items.map(postCard).join("");
+      }
+      var html="";
+      weekNums.forEach(function(wk){ html+=block("Week "+wk, byWeek[wk]); });
+      if(byWeek.pre) html+=block("Before start · undated", byWeek.pre);
+      listEl.innerHTML=html;
+    } else {
+      listEl.innerHTML=S.posts.slice().sort(newestFirst).map(postCard).join("");
+    }
   }
 
   /* ---------- MONEY ---------- */
@@ -1005,14 +1159,24 @@
   }
 
   /* ---------- init ---------- */
+  // reflect current state into the config-driven inputs
+  function syncInputs(){
+    $("in-start").value=S.config.startDate||"";
+    $("in-followers").value=(S.config.followers!=null)?S.config.followers:"";
+    $("in-waitlist").value=(S.config.waitlist!=null)?S.config.waitlist:"";
+    var t=S.config.targets||{};
+    $("tg-views").value=(t.views!=null)?t.views:"";
+    $("tg-waitlist").value=(t.waitlist!=null)?t.waitlist:"";
+    $("tg-ffloor").value=(t.followersFloor!=null)?t.followersFloor:"";
+    $("tg-fceil").value=(t.followersCeil!=null)?t.followersCeil:"";
+  }
+
   function init(){
     buildTabs();
 
     $("np-date").value=todayISO();
     $("ne-date").value=todayISO();
-    $("in-start").value=S.config.startDate||"";
-    if(S.config.followers!=null) $("in-followers").value=S.config.followers;
-    if(S.config.waitlist!=null) $("in-waitlist").value=S.config.waitlist;
+    syncInputs();
 
     try{ var th=localStorage.getItem(KEY+".theme"); if(th) document.documentElement.setAttribute("data-theme",th); }catch(e){}
 
@@ -1043,10 +1207,11 @@
       S.posts.push({
         id:uid(), date:$("np-date").value||todayISO(),
         platform:$("np-platform").value, format:$("np-format").value,
-        hook:$("np-hook").value.trim(), views:0,saves:0,shares:0,comments:0,followers:0
+        hook:$("np-hook").value.trim(), link:$("np-link").value.trim(), notes:$("np-notes").value.trim(),
+        views:0,saves:0,shares:0,comments:0,followers:0
       });
       save();
-      $("np-hook").value="";
+      $("np-hook").value=""; $("np-link").value=""; $("np-notes").value="";
       document.querySelectorAll('#prePostChecklist input').forEach(function(b){b.checked=false;});
       refreshAddPost();
       renderPosts(); renderVitals(); renderGauges(); updateTabBadges();
@@ -1065,10 +1230,16 @@
     });
     // reflag best on blur (avoids yanking the field mid-edit)
     $("postList").addEventListener("blur",function(e){
-      if(e.target.getAttribute("data-edit")==="hook"){
+      var edit=e.target.getAttribute("data-edit");
+      if(edit==="hook"){
         var id=e.target.getAttribute("data-id");
         var p=S.posts.find(function(x){return x.id===id;});
         if(p){ var t=e.target.textContent.trim(); p.hook = (t==="(no hook — bold move)")?"":t; save(); }
+      }
+      if(edit==="notes"){
+        var id2=e.target.getAttribute("data-id");
+        var p2=S.posts.find(function(x){return x.id===id2;});
+        if(p2){ p2.notes=e.target.textContent.trim(); save(); }
       }
       if(e.target.getAttribute("data-metric")){ renderPosts(); }
     },true);
@@ -1078,13 +1249,68 @@
         S.posts=S.posts.filter(function(x){return x.id!==del;});
         save(); renderPosts(); renderVitals(); renderGauges(); updateTabBadges();
         toast("Post deleted. It happens.");
+        return;
+      }
+      var lid=e.target.getAttribute("data-edit-link");
+      if(lid){
+        var lp=S.posts.find(function(x){return x.id===lid;});
+        if(lp){
+          var url=prompt("Post link (URL):", lp.link||"");
+          if(url!==null){ lp.link=url.trim(); save(); renderPosts(); }
+        }
       }
     });
 
     // gate inputs
     $("in-followers").addEventListener("input",function(){ S.config.followers=this.value===""?null:n(this.value); save(); renderGauges(); renderVitals(); });
     $("in-waitlist").addEventListener("input",function(){ S.config.waitlist=this.value===""?null:n(this.value); save(); renderGauges(); renderVitals(); });
-    $("in-start").addEventListener("change",function(){ S.config.startDate=this.value; save(); renderClock(); renderVitals(); });
+    $("in-start").addEventListener("change",function(){ S.config.startDate=this.value; save(); renderClock(); renderVitals(); renderPosts(); });
+
+    // editable gate targets
+    function bindTarget(inputId, key){
+      $(inputId).addEventListener("input",function(){
+        S.config.targets = S.config.targets || {};
+        S.config.targets[key] = this.value===""?null:n(this.value);
+        save(); renderGauges(); renderVitals();
+      });
+    }
+    bindTarget("tg-views","views"); bindTarget("tg-waitlist","waitlist");
+    bindTarget("tg-ffloor","followersFloor"); bindTarget("tg-fceil","followersCeil");
+
+    // backup / restore
+    $("exportBtn").addEventListener("click",function(){
+      try{
+        var data=JSON.stringify(S,null,2);
+        var blob=new Blob([data],{type:"application/json"});
+        var url=URL.createObjectURL(blob);
+        var a=document.createElement("a");
+        a.href=url; a.download="gutted-backup-"+todayISO()+".json";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+        toast("Backup downloaded.");
+      }catch(err){ toast("Couldn't export — try again."); }
+    });
+    $("importBtn").addEventListener("click",function(){ $("importFile").click(); });
+    $("importFile").addEventListener("change",function(e){
+      var file=e.target.files && e.target.files[0]; if(!file) return;
+      var reader=new FileReader();
+      reader.onload=function(){
+        var data; try{ data=JSON.parse(reader.result); }catch(err){ toast("That's not a valid backup file."); return; }
+        if(!data || typeof data!=="object" || !Array.isArray(data.posts) || !Array.isArray(data.tasks)){
+          toast("That file doesn't look like a GUTTED backup."); return;
+        }
+        if(!confirm("Replace everything on this device with the backup? Your current data will be overwritten.")) { e.target.value=""; return; }
+        S=data;
+        S.config=S.config||{startDate:"",followers:null,waitlist:null};
+        S.posts=S.posts||[]; S.expenses=S.expenses||[]; S.tasks=S.tasks||[]; S.ideas=S.ideas||[];
+        try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(err){}
+        syncInputs();
+        renderAll(); refreshAddPost();
+        toast("Restored from backup.");
+      };
+      reader.readAsText(file);
+      e.target.value="";
+    });
 
     // money
     $("addExpenseBtn").addEventListener("click",function(){
@@ -1153,16 +1379,16 @@
         S=seed();
         try{ localStorage.removeItem(KEY); }catch(e){}
         save();
-        $("in-followers").value=""; $("in-waitlist").value=""; $("in-start").value="";
         $("np-date").value=todayISO(); $("ne-date").value=todayISO();
+        syncInputs();
         renderAll(); refreshAddPost(); showTab("posts");
         toast("Wiped. Fresh start.");
       }
     });
 
-    // keep single-line contenteditables single-line
+    // keep single-line contenteditables single-line (notes may wrap)
     document.addEventListener("keydown",function(e){
-      if(e.key==="Enter" && e.target.isContentEditable){ e.preventDefault(); e.target.blur(); }
+      if(e.key==="Enter" && e.target.isContentEditable && e.target.getAttribute("data-edit")!=="notes"){ e.preventDefault(); e.target.blur(); }
     });
   }
 
