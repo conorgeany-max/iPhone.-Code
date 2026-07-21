@@ -1,64 +1,69 @@
-# Solace — Daily Reflections 🤎
+# GUTTED — Launch Tracker
 
-A warm, private space to reflect on each day of the year and gain gentle insight.
-Solace is a **Progressive Web App (PWA)** — it runs in the browser but installs to your
-iPhone Home Screen and feels like a native app, with a full-screen icon and offline writing.
+A single-file command center for the 4-week validation test behind **GUTTED**. Log your
+posts, watch the week-4 gate, and don't blow the $50 phase cap. It runs in the browser
+but installs to your iPhone Home Screen as a **Progressive Web App (PWA)** — full-screen
+icon, works offline, no login, no server, no external APIs.
 
-## What it does
+Everything lives in your browser's local storage on this one device. Nothing is uploaded
+anywhere.
 
-- **Today** — write your reflection for the day, choose how it felt, and save it. A fresh prompt greets you daily, and a 🔥 streak counter tracks how many days in a row you've shown up. "On this day" surfaces a past reflection when one exists.
-- **Journal** — every entry is stored on its own page, browsable and searchable by date and mood, with a colour-coded month calendar, a mood breakdown, and your streak/entry stats. Your record of showing up.
-- **Reflect** — an AI companion that has read *all* of your journal and helps you notice patterns, reframe hard days, and understand yourself with more compassion. It's grounded in what you actually wrote, references specific days, and asks caring questions.
+## The five tabs
 
-### Also included
+- **Posts** — log each post (date, platform, format, hook) and update the metrics over time:
+  views, saves, shares, comments, new followers. A pre-post **gut check** appears every time
+  you add one (no therapeutic claims — nothing *fixes / cures / treats / relieves*, not even
+  as a joke; humour in the feeling, not a promise; replied to the last post's comments). Your
+  best performer is auto-flagged by **saves + shares** (deliberately not likes). A progress bar
+  tracks X of 12 posts against the 4-week target, and a "days since last post" nag turns red
+  after 3 days.
+- **The Gate** — three gauges against the green-gate criteria: **1 post over 10k views**,
+  **200–500 followers**, **50+ waitlist signups**. Type your current follower and waitlist
+  totals (update them from Carrd); best-view is pulled from your posts automatically. A verdict
+  line reads the data: **GREEN** (all three trending to hit) / **SHARPEN HOOKS** (soft but alive)
+  / **FLATLINE** (nothing moving across 12 posts). Set your start date and it counts down the
+  days left in the test.
+- **Money** — $1,000 total budget with a $50 current-phase cap. Log every expense with a
+  category; the phase bar warns as you approach $50 and hard-stops at it. A permanent list of
+  **banned spends** (logo, packaging, trademark filing, ads, anything with GUTTED on it) sits
+  right there as a reminder.
+- **Tasks** — a pre-loaded, phased checklist: **Setup** → **Weekly loop** → **Week 4** →
+  **If green** (creator shortlist, manufacturer emails to APM / Lipa / Morlife, pre-sale plan).
+  Add, check, and delete your own.
+- **Ideas** — quick-capture for content ideas with a format tag, seeded with your existing
+  formats so ideas stop living in your head.
 
-- **Passcode lock** — optionally protect your journal with a 4-digit passcode (Settings → Privacy).
-- **Backup & restore** — export your whole journal to a file, and import it back on a new device (Settings → Your data). Solace also asks the browser for durable storage so your entries are less likely to be evicted.
-- **Bold, theme-aware design** — a vibrant sunset-to-violet palette that adapts to your phone's light or dark mode.
-
-## Your privacy
-
-- Your reflections are stored **only on your device**, in the browser's local storage. Nothing is uploaded to any server by the app itself.
-- The **Reflect** companion is powered by [Claude](https://www.anthropic.com/claude). To use it you add your own Claude API key in Settings; the key is stored only on your device and is used solely to send your messages (and your journal, as context) directly to Anthropic so Claude can respond.
-- Use **Settings → Export my data** any time to download a JSON backup of your journal.
-
-Solace is a reflective companion — **not** a therapist, medical service, or crisis line. If you're in crisis, contact local emergency services or a crisis line (e.g. call or text **988** in the US).
+Every entry is editable after you save it — tap a hook, task, idea, or expense label and type.
+The **Danger zone** on the Ideas tab wipes everything on the device.
 
 ## Get it on your iPhone
 
-1. **Host the app** so your phone can open it over HTTPS (pick one):
-   - **GitHub Pages (free):** in this repo, go to **Settings → Pages**, set the source to your branch (root), and open the published URL on your iPhone.
-   - Or any static host (Netlify, Vercel, Cloudflare Pages) — just deploy this folder.
-2. Open the URL in **Safari** on your iPhone.
-3. Tap the **Share** button → **Add to Home Screen**. Solace now opens full-screen like a real app.
-
-## Connect the AI companion
-
-1. Create a Claude API key at **[console.anthropic.com](https://console.anthropic.com/settings/keys)** (you'll need an Anthropic account; API usage is billed to you, and reflections are short so cost is minimal).
-2. In Solace, tap the **⚙︎** gear → paste your key → **Save**.
-3. Open **Reflect** and start talking.
-
-The companion uses `claude-opus-4-8` by default; you can change the model in Settings if you prefer another Claude model.
+1. **Host the files** over HTTPS (pick one):
+   - **GitHub Pages (free):** repo **Settings → Pages**, set the source to this branch (root),
+     then open the published URL on your iPhone.
+   - Or any static host (Netlify, Vercel, Cloudflare Pages) — deploy this folder as-is.
+2. Open the URL in **Safari**.
+3. Tap **Share → Add to Home Screen**. It now opens full-screen like a real app and works offline.
 
 ## Run it locally
 
-It's plain static files — no build step.
+Plain static files, no build step:
 
 ```bash
 python3 -m http.server 8000
 # then open http://localhost:8000
 ```
 
-(Journaling works offline; the AI companion needs an internet connection.)
+## Files
 
-## Project files
+| File | What it is |
+|------|------------|
+| `index.html` | The entire app — HTML, CSS, and JS in one self-contained file |
+| `manifest.webmanifest` | PWA metadata (name, icons, theme colors) |
+| `sw.js` | Service worker for offline caching |
+| `icons/` | Home Screen icons |
 
-| File | Purpose |
-|------|---------|
-| `index.html` | App shell, layout, and styles |
-| `app.js` | All app logic — entries, journal, the Claude-powered companion |
-| `sw.js` | Service worker for offline shell caching |
-| `manifest.webmanifest` | PWA manifest (Home Screen install, icons, theme) |
-| `icons/` | App icons |
+## A note on the copy
 
-Made with care. Be gentle with yourself. 🤎
+GUTTED is a brand, not a medical service. The tracker never lets a post make a therapeutic
+claim, and it says nothing about anyone's health. It just counts posts, dollars, and days.
