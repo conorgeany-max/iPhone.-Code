@@ -588,29 +588,54 @@
   function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
   function todayISO(){ var d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
 
+  // Stable-keyed seed tasks. Keys let us add new ones to existing users
+  // (via migrateTasks) without duplicating or resurrecting deleted tasks.
+  var SEED_TASKS = [
+    // — Setup —
+    {key:"s-tt",   phase:"Setup",       text:"Claim the @gutted handle on TikTok"},
+    {key:"s-ig",   phase:"Setup",       text:"Claim the @gutted handle on Instagram"},
+    {key:"s-bio",  phase:"Setup",       text:"Write the bio for both platforms"},
+    {key:"s-pic",  phase:"Setup",       text:"Set the same profile pic + name on both"},
+    {key:"s-carrd",phase:"Setup",       text:"Get the Carrd waitlist live"},
+    {key:"s-form", phase:"Setup",       text:"Wire the Carrd signup to the brand Gmail"},
+    {key:"s-link", phase:"Setup",       text:"Put the waitlist link in both bios"},
+    {key:"s-gmail",phase:"Setup",       text:"Set up the brand Gmail"},
+    {key:"s-hooks",phase:"Setup",       text:"Write 5 hooks before day one"},
+    {key:"s-film3",phase:"Setup",       text:"Film / prep the first 3 posts in advance"},
+    {key:"s-sounds",phase:"Setup",      text:"Save 10 trending sounds to test"},
+    // — Weekly loop —
+    {key:"w-post", phase:"Weekly loop", text:"Post 3–4 times this week"},
+    {key:"w-reply",phase:"Weekly loop", text:"Reply to every comment"},
+    {key:"w-metrics",phase:"Weekly loop",text:"Update the metrics on each post"},
+    {key:"w-bestc",phase:"Weekly loop", text:"Screenshot the best comment"},
+    {key:"w-bestp",phase:"Weekly loop", text:"Screenshot the best post's stats"},
+    {key:"w-note", phase:"Weekly loop", text:"Note which hook + format landed"},
+    {key:"w-engage",phase:"Weekly loop",text:"15 min engaging other gut-health creators"},
+    {key:"w-batch",phase:"Weekly loop", text:"Batch-film next week's posts"},
+    // — Week 4 —
+    {key:"g-nums", phase:"Week 4",      text:"Compile the numbers"},
+    {key:"g-inputs",phase:"Week 4",     text:"Fill follower + waitlist totals on the Gate"},
+    {key:"g-decide",phase:"Week 4",     text:"Make the gate decision"},
+    {key:"g-review",phase:"Week 4",     text:"Write down what worked / what flopped"},
+    {key:"g-backup",phase:"Week 4",     text:"Back up your best 3 posts"},
+    // — If green —
+    {key:"n-creators",phase:"If green", text:"Shortlist creator partners"},
+    {key:"n-apm",  phase:"If green",    text:"Email manufacturer: APM"},
+    {key:"n-lipa", phase:"If green",    text:"Email manufacturer: Lipa"},
+    {key:"n-morlife",phase:"If green",  text:"Email manufacturer: Morlife"},
+    {key:"n-compare",phase:"If green",  text:"Compare the 3 manufacturer quotes"},
+    {key:"n-presale",phase:"If green",  text:"Draft the pre-sale plan"},
+    {key:"n-price",phase:"If green",    text:"Set a pre-sale price + target units"},
+    {key:"n-launch",phase:"If green",   text:"Line up a launch-day post"}
+  ];
+
   function seed(){
     return {
       config:{ startDate:"", followers:null, waitlist:null },
       posts:[],
       expenses:[],
-      tasks:[
-        {id:uid(),phase:"Setup",text:"Claim the @gutted handle on TikTok",done:false},
-        {id:uid(),phase:"Setup",text:"Claim the @gutted handle on Instagram",done:false},
-        {id:uid(),phase:"Setup",text:"Write the bio for both platforms",done:false},
-        {id:uid(),phase:"Setup",text:"Get the Carrd waitlist live",done:false},
-        {id:uid(),phase:"Setup",text:"Set up the brand Gmail",done:false},
-        {id:uid(),phase:"Weekly loop",text:"Post 3–4 times this week",done:false},
-        {id:uid(),phase:"Weekly loop",text:"Reply to every comment",done:false},
-        {id:uid(),phase:"Weekly loop",text:"Update the metrics on each post",done:false},
-        {id:uid(),phase:"Weekly loop",text:"Screenshot the best comment",done:false},
-        {id:uid(),phase:"Week 4",text:"Compile the numbers",done:false},
-        {id:uid(),phase:"Week 4",text:"Make the gate decision",done:false},
-        {id:uid(),phase:"If green",text:"Shortlist creator partners",done:false},
-        {id:uid(),phase:"If green",text:"Email manufacturer: APM",done:false},
-        {id:uid(),phase:"If green",text:"Email manufacturer: Lipa",done:false},
-        {id:uid(),phase:"If green",text:"Email manufacturer: Morlife",done:false},
-        {id:uid(),phase:"If green",text:"Draft the pre-sale plan",done:false}
-      ],
+      tasks:SEED_TASKS.map(function(st){ return {id:uid(),phase:st.phase,text:st.text,done:false,key:st.key}; }),
+      seededKeys:SEED_TASKS.map(function(st){ return st.key; }),
       ideas:[
         {id:uid(),text:"Two-bubble gut conversations",format:"two-bubble"},
         {id:uid(),text:"The trademark disaster story",format:"build-in-public"},
@@ -625,6 +650,22 @@
   catch(e){ S = seed(); }
   S.config = S.config || {startDate:"",followers:null,waitlist:null};
   S.posts = S.posts || []; S.expenses = S.expenses || []; S.tasks = S.tasks || []; S.ideas = S.ideas || [];
+
+  // Add any newly-shipped seed tasks to existing users, once each.
+  // Matches legacy tasks by text so the original set isn't duplicated,
+  // and never resurrects a seeded task the user has since deleted.
+  (function migrateTasks(){
+    if(!Array.isArray(S.seededKeys)) S.seededKeys = [];
+    var texts = S.tasks.map(function(t){ return t.text; });
+    var added = false;
+    SEED_TASKS.forEach(function(st){
+      if(S.seededKeys.indexOf(st.key) >= 0) return;      // already introduced
+      if(texts.indexOf(st.text) >= 0){ S.seededKeys.push(st.key); return; } // legacy match
+      S.tasks.push({id:uid(),phase:st.phase,text:st.text,done:false,key:st.key});
+      S.seededKeys.push(st.key); added = true;
+    });
+    if(added) localStorage.setItem(KEY, JSON.stringify(S));
+  })();
 
   var saveTimer;
   function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(function(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }, 120); }
